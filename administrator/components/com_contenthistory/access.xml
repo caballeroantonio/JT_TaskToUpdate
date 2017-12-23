@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<access component="com_contenthistory">
+	<section name="component">
+		<action name="core.admin" title="JACTION_ADMIN" description="JACTION_ADMIN_COMPONENT_DESC" />
+		<action name="core.manage" title="JACTION_MANAGE" description="" />
+                <action name="core.manage" title="JACTION_MANAGE" description="" />
+                <action name="load" title="COM_CONTENTHISTORY_BUTTON_LOAD" description="COM_CONTENTHISTORY_BUTTON_LOAD_DESC" />
+                <action name="preview" title="COM_CONTENTHISTORY_BUTTON_PREVIEW" description="COM_CONTENTHISTORY_BUTTON_PREVIEW_DESC" />
+                <action name="compare" title="COM_CONTENTHISTORY_BUTTON_COMPARE" description="COM_CONTENTHISTORY_BUTTON_COMPARE_DESC" />
+                <action name="keep" title="COM_CONTENTHISTORY_BUTTON_KEEP" description="COM_CONTENTHISTORY_BUTTON_KEEP_DESC" />
+                <action name="core.delete" title="JACTION_DELETE" description="JACTION_DELETE_COMPONENT_DESC" />
+	</section>
+</access>
