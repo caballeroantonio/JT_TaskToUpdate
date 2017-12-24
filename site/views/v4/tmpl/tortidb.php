@@ -181,6 +181,10 @@ foreach($campos as $campo){
 			echo "error con: $campo->dataType";
 		break;
 	}
+	
+	if($campo->dataIndex == 'billete')
+	echo ", INDEX `idx_billete` (`billete` ASC)";
+	
 	if( ($i)!=count($campos))
 		echo ',';
 }

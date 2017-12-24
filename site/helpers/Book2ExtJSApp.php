@@ -744,6 +744,12 @@ EOD;
             break;
         }
         
+        
+        if($campo->dataIndex == 'billete'){
+            $field['regex'] = $this->t349h->insertAs_Is('/^\w$/');
+            $field['regexText'] = 'solo carácteres alfanuméricos';
+        }
+        
         $fields[$campo->dataIndex] = $field;
         return $field;
     }
