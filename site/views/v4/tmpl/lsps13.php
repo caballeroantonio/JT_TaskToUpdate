@@ -38,7 +38,7 @@ LEFT JOIN jt_uploadedfiles f_2445 ON l.field2445 = f_2445.id
 require_once ( JPATH_COMPONENT . '/helpers/Book2ExtJSApp.php' );
 class lsc02App extends Tsjdf_libros2HelpersBook2ExtJSApp{
 
-    function getModelFields_() {
+    function getModelFields() {
         $fields = parent::getModelFields();		
 		//FECHA DE LA FIRMA
         $fields[] = array(

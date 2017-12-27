@@ -266,8 +266,10 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 				$id = JRequest::getInt('id',-1);//podría usar in_array('id', $_REQUEST) en lugar de if($id), no me conviene poner cero como condicion inicial
 				if($id > 0)
 					$this->query->where("l.id='{$id}'", 'AND');//solo carga un registro
-				if($queryRequest)
-					$this->query->where("l.name LIKE '{$queryRequest}%'", 'AND');
+				if($queryRequest){
+                                    $queryRequest = $this->db->escape($queryRequest);
+                                    $this->query->where("l.name LIKE '{$queryRequest}%'", 'AND');
+                                }
 			}else{
 				$this->query->order('anoj DESC'); 
 				switch($libro['distribution']){
@@ -381,12 +383,29 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 					$this->query->from('jtc_organos l');
 					$this->query->order('id_tipoorgano, id_materia, published DESC, numero');
 					break;
+				case 'organos_jp':
+                                        $this->query->clear('select')
+                                        ->select('id, organo')
+                                        ->where('id_tipoorgano = 1')
+                                        ->where('id_materia = 5')
+                                        ->from('jtc_organos l')
+                                        ->order('id_tipoorgano, id_materia, published DESC, numero');
+					break;
 				case 'organosextintos':
 					$this->query->from("jtc_organos l");
 					$this->query->where("published = false");
 					$this->query->where("id_tipoorgano = '{$this->empleado->o__id_tipoorgano}'");
 					$this->query->where("id_materia = '{$this->empleado->o__id_materia}'");
 					$this->query->order('id_tipoorgano, id_materia, published DESC, numero');
+					break;
+				case 'magistradop':
+					if($this->checkLogin())
+						break;
+                                        $this->query->clear('select')
+                                        ->select('e__id AS "id", u__name')
+                                        ->where('e__id_rol = 91')
+                                        ->where("e__id_organo = {$this->empleado->id_organo}")
+					->from('jtva_empleados l');
 					break;
 				case 'tipojuicio':
 					if($this->checkLogin())
@@ -885,10 +904,11 @@ AND c.published AND c.clave = '{$this->clave}' AND c.dataType = 'parent'");
                     $query->select('GROUP_CONCAT(e.name, " del ", o.organo) billetes')
                     ->from("{$this->tableName} l")
                     ->join('LEFT', 'jt_expedientes e ON e.id = l.id_expediente')
-                    ->join('LEFT', 'jtc_organos o ON o.id = l.id_organo')
-                    ->where("l.id != {$object->id}")
-                    ->where('l.billete = '. $this->db->quote($object->billete))
-                    ;
+                    ->join('LEFT', 'jtc_organos o ON o.id = l.id_organo');
+                    $query->where('l.billete = '. $this->db->quote($object->billete));
+                    if(isset($object->id))
+                        $query->where("l.id != {$object->id}");
+                        
                     $this->setQuery($query);
                     $billetes = $this->db->loadResult();
                     if($billetes){

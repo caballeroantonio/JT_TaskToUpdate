@@ -161,7 +161,7 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
             );
             $columns['e__pena'] = array(
                 'xtype' =>'gridcolumn',
-                'text' =>'Pena de prisión',
+                'text' =>'Pena total o medida privativa',
                 'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
                                         return record.getExpediente().data.pena;
                         }"),
@@ -773,7 +773,7 @@ EOD;
         
         
         if($campo->dataIndex == 'billete'){
-            $field['regex'] = $this->t349h->insertAs_Is('/^\w$/');
+            $field['regex'] = $this->t349h->insertAs_Is('/^\w*$/');
             $field['regexText'] = 'sólo caracteres alfanuméricos';
         }
         

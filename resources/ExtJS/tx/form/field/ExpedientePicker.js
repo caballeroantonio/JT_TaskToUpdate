@@ -37,8 +37,8 @@ Ext.define('Ext.tx.form.ExpItems', {
                             minValue: 0,
                             allowBlank: false,
                             hideTrigger: true,
-                            regex: /^(19[6789]\d|20[0-5]\d)$/,//1960-2059
-                            regexText: 'año (1960-2059)',
+                            regex: /^(19\d\d|20[0-5]\d)$/,//1900-2059
+                            regexText: 'año (1900-2059)',
 
                             itemId: 'ano',
                             listeners: {
@@ -115,7 +115,7 @@ Ext.define('Ext.tx.form.ExpItems', {
                                 },
                                 {
                                     'name': 'pena',
-                                    'fieldLabel': 'Pena de prisión',
+                                    'fieldLabel': 'Pena total o medida privativa',
                                     'xtype': 'textfield',
                                     'maxLength': 255
                                 }
