@@ -151,7 +151,7 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
                 'text' => $this->t349h->insertAs_Is('Ext.tx.form.field.ExpedientePicker.prototype.fieldLabel'),
             );  
 
-         if($this->libro['id_tipoorgano']== 2 && $this->libro['id_materia'] == 5){
+         if($this->libro['id_tipoorgano']== 2 && $this->libro['id_materia'] == 14){
             $columns['e__delito'] = array(
                 'xtype' =>'gridcolumn',
                 'text' =>'Delito',
@@ -162,6 +162,23 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
             $columns['e__pena'] = array(
                 'xtype' =>'gridcolumn',
                 'text' =>'Pena de prisión',
+                'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
+                                        return record.getExpediente().data.pena;
+                        }"),
+            );
+         }
+		 
+         if($this->libro['id_tipoorgano']== 2 && $this->libro['id_materia'] == 5){
+            $columns['e__delito'] = array(
+                'xtype' =>'gridcolumn',
+                'text' =>'Delito',
+                'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
+                                        return record.getExpediente().data.delito;
+                        }"),
+            );
+            $columns['e__pena'] = array(
+                'xtype' =>'gridcolumn',
+                'text' =>'Pena o medida privativa',
                 'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
                                         return record.getExpediente().data.pena;
                         }"),
@@ -512,8 +529,18 @@ EOD;
                     'xtype' => 'expedientepicker',
                     'name' => 'id_expediente',
                     'isSala' => $this->libro['id_tipoorgano'] == 2,
-                    'isSalaPenal' => $this->libro['id_tipoorgano'] == 2 && $this->libro['id_materia'] == 5,
-                    'regimeSelector' => !($this->libro['id_tipoorgano'] == 2 && $this->libro['id_materia'] == 5),
+                    'isSalaPenal' => $this->libro['id_tipoorgano'] == 2 && 
+                        (
+                            $this->libro['id_materia'] == 5 ||
+                            $this->libro['id_materia'] == 14
+                        ),
+                    'regimeSelector' => !(
+                        $this->libro['id_tipoorgano'] == 2 &&
+                        (
+                                $this->libro['id_materia'] == 5 || 
+                                $this->libro['id_materia'] == 14
+                        )
+                    ),
                 );
             
                 $this->fields['id_expediente']['allowBlankAddress'] = !($this->empleado->o__id_tipoorgano == 1 && $this->empleado->o__id_materia < 4);
@@ -747,7 +774,7 @@ EOD;
         
         if($campo->dataIndex == 'billete'){
             $field['regex'] = $this->t349h->insertAs_Is('/^\w$/');
-            $field['regexText'] = 'solo carácteres alfanuméricos';
+            $field['regexText'] = 'sólo caracteres alfanuméricos';
         }
         
         $fields[$campo->dataIndex] = $field;

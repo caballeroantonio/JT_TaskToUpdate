@@ -437,6 +437,10 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 									115	Diverso Acreedor
 									117     Sentenciado
 									116     otro
+127	Imputado
+128	Acusado
+129	Ofendido
+130	Apelante
 									*/
                                     $query_where_in = '116, 109, 110';
                                     switch($this->empleado->o__id_tipoorgano*1000+$this->empleado->o__id_materia){
@@ -448,9 +452,12 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
                                         case 1002://Juzgado Oral en Materia Civil
                                             $query_where_in .= ',113';
                                             break;
-                                        case 2014://Sala en materia Penal
+                                        case 2014://Sala de Ejecución de Sanciones Penales
                                             $query_where_in .= ',117';
                                             break;
+										case 2005://Sala en materia penal
+											$query_where_in .= ',127, 128, 129, 130';
+										break;
                                     }
                                         
 					$this->query->clear('select');
