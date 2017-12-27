@@ -1,0 +1,157 @@
+@charset "utf-8";
+/* CSS Document */
+
+.logout-button,
+.login-greeting{
+	text-align: right;
+}
+
+.icon-add
+{
+    background:url(../images/add.png) no-repeat left center !important;
+}
+.icon-save {
+    background-image: url(../images/save.gif) !important;
+}
+
+.icon-ok {
+    background-image: url(../../images/open_icon_library-standard/icons/png/16x16/actions/dialog-ok-3.png);
+}
+
+.icon-reset {
+    background-image: url(../images/stop.png) !important;
+}
+
+.icon-cancel {
+	background-image: url(../../images/open_icon_library-standard/icons/png/16x16/actions/dialog-cancel-3.png);
+}
+
+.icon-print {
+	background-image: url(../../images/open_icon_library-standard/icons/png/16x16/places/folder-table.png);
+}
+
+.ux-filtered-column{
+	color: red;
+}
+
+div.x-grid-cell-inner > ul.personas{
+	margin: 0em 0 0em 1em;
+}
+
+ul.personas > li.fisica {
+    background-image: url("../../images/open_icon_library-standard/icons/ico/22x22/apps/personal.ico");
+    background-position: left top;
+    background-repeat: no-repeat;
+    overflow-x: visible;
+    overflow-y: hidden;
+	overflow: hidden;
+    padding-left: 22px;
+	font-size: 13px;
+}
+
+ul.personas > li.moral {
+    background-image: url("../../images/open_icon_library-standard/icons/png/16x16/actions/building.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    overflow-x: visible;
+    overflow-y: hidden;
+	overflow: hidden;
+    padding-left: 22px;
+	font-size: 13px;
+}
+
+.multiline textarea {
+	background: none repeat scroll 0 0 pink;
+}
+
+/*el validador lo sobreescribe*/
+.expediente input{
+	 background-color: #6699FF;
+}
+
+.x-form-persons-trigger {
+	background: no-repeat url("../../images/fatcow-hosting-icons-2000/16x16/group.png");
+}
+
+.x-form-person-trigger {
+	background: no-repeat url("../../images/fatcow-hosting-icons-2000/16x16/user.png");
+	background-position: 0 0 !important;
+}
+
+img.action-delete{
+	background:  no-repeat url("../../images/open_icon_library-standard/icons/png/16x16/actions/edit-delete-6.png");
+	width: 16px;
+	height: 16px;
+}
+
+.x-grid-rowbody {
+	overflow: scroll;
+}
+
+/*
+imprime solo el grid
+*/
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  #extjs-content, #extjs-content * {
+    visibility:visible;
+  }
+  #extjs-content {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+}
+
+.x-form-expediente-trigger {
+	/*background: no-repeat url("../../images/open_icon_library-standard/icons/png/16x16/actions/view-process-users.png");
+	background-position: 0 center !important;*/
+	background-image: url("../images/exp_btn.png");
+}
+/*<!--perifericos-->*/
+.x-form-fingerprint-trigger {
+	background: no-repeat url("../images/fingerprint.png");
+	background-position: 0 center !important;
+}
+.x-form-wacom-trigger {
+	background: no-repeat url("../../images/open_icon_library-standard/icons/png/16x16/devices/input-tablet.png");
+	background-position: 0 center !important;
+}
+
+img.wacom-preview[src=""] {
+    /*background-image: url("uploads/1386893674-13914.jpg");*/
+    display:inline-block;
+}
+img.wacom-preview{
+	width: 150px;
+	height:37px;
+/*	width: 396px;
+	height:100px;*/
+}
+img.fingerprint-preview[src=""] {
+    background-image: url("../images/emptySensor.png");
+    display:inline-block;
+}
+img.fingerprint-preview{
+    width: 105px;
+    height: 127px;
+}
+
+div.x-grid-rowbody p img[src=""] {
+   display: none;
+}
+/*<!--perifericos-->*/
+
+/*exp picker con número de expediente*/
+.expedientefc{
+    display: inline-flex;
+}
+.expedientefc .x-form-trigger-wrap{
+    width: 40% !important;;
+}
+
+.expedientefc div#expedientefv{
+    width: 60%;
+}
