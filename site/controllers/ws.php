@@ -291,7 +291,7 @@ class Tsjdf_libros2ControllerWS extends Tsjdf_libros2Controller
     */
     protected function juecesOnly(){
         $this->checkLogin();
-        if($this->empleado->id_rol != 91){
+        if(!in_array($this->empleado->id_rol, [91,131])){
             $this->result['success'] = false;
             $this->result['message'] .= 'Acceso exclusivo para jueces y magistrados.<br/>';
             $this->finish();

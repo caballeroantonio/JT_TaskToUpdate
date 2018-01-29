@@ -4,8 +4,19 @@ Ext.define('Ext.tx.form.ExpItems', {
     alias: 'widget.exp_items',
 
     itemId: 'expItems',
-    isSala: false,
-    isSalaPenal: false,
+    
+/*
+have_bis_nrecurso=true
+id_tipoarchivo = catalogo.general11 = {Toca, Recusación, Expedientillo que no corresponde, Amparo exploratorio}
+have_bis_nrecurso = false
+id_tipoarchivo = catalogo.general10{Expediente principal, Expedientillo, Cuaderno de amparos, Cuadernillo}
+*/
+	have_bis_nrecurso: false,
+    have_delito_pena: false,
+    have_tipojuicio: true,
+	
+	
+	
     defaults: {
         anchor: '100%',
     },
@@ -52,7 +63,7 @@ Ext.define('Ext.tx.form.ExpItems', {
                             forceSelection: true,
                             queryMode: 'local',
 
-                            store: Ext.create('tsjdf.store.catalogo.' + (this.isSala?'general11':'general10')).load(),
+                            store: Ext.create('tsjdf.store.catalogo.' + (this.have_bis_nrecurso?'general11':'general10')).load(),
                             //'catalogo.general10',
                             displayField: 'text',
                             valueField: 'id',
@@ -62,18 +73,20 @@ Ext.define('Ext.tx.form.ExpItems', {
                     },
                     {
                             xtype: 'combotextfieldset',
+                            disabled: !this.have_tipojuicio,
+                            hidden: !this.have_tipojuicio,
                             title: 'Tipo de juicio',
                             fieldname: 'tipojuicio',
                             store: 'catalogo.tipojuicio',
                             displayField: 'tipojuicio',
                             valueField: 'id',
-                            allowBlank: false,
+                            allowBlank: !this.have_tipojuicio,
                             other_id: 53,
                     },
                     {
                             xtype: 'fieldcontainer',
-                            disabled: !this.isSala,
-                            hidden: !this.isSala,
+                            disabled: !this.have_bis_nrecurso,
+                            hidden: !this.have_bis_nrecurso,
                             defaults: {
                                     anchor: '100%',
                             },
@@ -100,8 +113,8 @@ Ext.define('Ext.tx.form.ExpItems', {
                     },
                     {
                             xtype: 'fieldcontainer',
-                            disabled: !this.isSalaPenal,
-                            hidden: !this.isSalaPenal,
+                            disabled: !this.have_delito_pena,
+                            hidden: !this.have_delito_pena,
                             defaults: {
                                     anchor: '100%',
                             },
@@ -174,11 +187,8 @@ Ext.define('Ext.tx.form.field.ExpedientePicker', {
         },
     },
 	
-	/**
-	* isSala = true deshabilita el campo bis
-	*/
-	isSala: false,
-	isSalaPenal: false,
+	have_bis_nrecurso: false,
+	have_delito_pena: false,
 	
 	regimeSelector: true,
 	fieldLabel: 'Expediente',
@@ -341,8 +351,9 @@ Ext.define('Ext.tx.form.field.ExpedientePicker', {
                             items: [
                                 {
                                     xtype: 'exp_items',
-                                    isSala: this.isSala,
-									isSalaPenal: this.isSalaPenal,
+                                    have_bis_nrecurso: this.have_bis_nrecurso,
+									have_delito_pena: this.have_delito_pena,
+									have_tipojuicio: this.have_tipojuicio,
                                     scope: this,
                                     anoChangeFn: function(field, newValue, oldValue, options) {
                                         var allowBlank = this.allowBlankAddress || newValue < 2017;
@@ -427,45 +438,10 @@ Ext.define('Ext.tx.form.field.ExpedientePicker', {
 				}],
 		});
 		
-		this.partescontenciosasGrid = Ext.create('Ext.tx.grid.Book2',
-			{
+                var partescontenciosasGrid_args = {
 				xtype: 'book',
 				bbar: null,
-				tbar: [
-                                   {
-                                        xtype: 'button',
-                                        icon: 'media/com_tsjdf_libros2/images/ij/ij_109.png',
-                                        text: 'Añadir nuevo actor',
-                                        handler: function(btn, evnt){
-                                            var grid = btn.up('grid');
-                                            var record = new grid.store.model();
-                                            record.set({id_ijuridico: 109, txt_ijuridico:'Actor'})
-                                            grid.setActiveRecord(record);
-                                        },
-                                    },
-                                   {
-                                        xtype: 'button',
-                                        icon: 'media/com_tsjdf_libros2/images/ij/ij_110.png',
-                                        text: 'Añadir nuevo demandado',
-                                        handler: function(btn, evnt){
-                                            var grid = btn.up('grid');
-                                            var record = new grid.store.model();
-                                            record.set({id_ijuridico: 110, txt_ijuridico:'Demandado'})
-                                            grid.setActiveRecord(record);
-                                        },
-                                    },
-                                   {
-                                        xtype: 'button',
-                                        iconCls: 'icon-add',
-                                        text: 'Añadir nuevo registro',
-                                        handler: function(btn, evnt){
-                                            var grid = btn.up('grid');
-                                            var record = new grid.store.model();
-//                                            record.set(grid.initialConditions);
-                                            grid.setActiveRecord(record);
-                                        },
-                                    },
-					   ],
+				tbar: [ ],
 				itemId: 'partescontenciosas',
 				//initialConditions: {id_field: 2156},
 				title: 'Partes contenciosas',
@@ -554,8 +530,49 @@ Ext.define('Ext.tx.form.field.ExpedientePicker', {
                 },
         },
     },
-			}
-		);
+			};
+                        
+                //Actor button
+                if(Ext.StoreMgr.get('catalogo.general28').getById(109))
+                    partescontenciosasGrid_args.tbar.push({
+                                        xtype: 'button',
+                                        icon: 'media/com_tsjdf_libros2/images/ij/ij_109.png',
+                                        text: 'Añadir nuevo actor',
+                                        handler: function(btn, evnt){
+                                            var grid = btn.up('grid');
+                                            var record = new grid.store.model();
+                                            record.set({id_ijuridico: 109, txt_ijuridico:'Actor'})
+                                            grid.setActiveRecord(record);
+                                        },
+                                    });
+                //Demandado button
+                if(Ext.StoreMgr.get('catalogo.general28').getById(110))
+                    partescontenciosasGrid_args.tbar.push({
+                                        xtype: 'button',
+                                        icon: 'media/com_tsjdf_libros2/images/ij/ij_110.png',
+                                        text: 'Añadir nuevo demandado',
+                                        handler: function(btn, evnt){
+                                            var grid = btn.up('grid');
+                                            var record = new grid.store.model();
+                                            record.set({id_ijuridico: 110, txt_ijuridico:'Demandado'})
+                                            grid.setActiveRecord(record);
+                                        },
+                                    });
+
+                //otros button
+                partescontenciosasGrid_args.tbar.push({
+                                        xtype: 'button',
+                                        iconCls: 'icon-add',
+                                        text: 'Añadir nuevo registro',
+                                        handler: function(btn, evnt){
+                                            var grid = btn.up('grid');
+                                            var record = new grid.store.model();
+//                                            record.set(grid.initialConditions);
+                                            grid.setActiveRecord(record);
+                                        },
+                                    });
+                        
+		this.partescontenciosasGrid = Ext.create('Ext.tx.grid.Book2', partescontenciosasGrid_args);
 		
 		return Ext.create('Ext.window.Window', {
 			title: 'Busca, selecciona o ingresa un asunto en el órgano judicial',

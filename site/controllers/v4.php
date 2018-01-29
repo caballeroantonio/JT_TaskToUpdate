@@ -281,7 +281,7 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 //							$this->query->order('l.id_secretaria'); 
 					break;
 					case 3://por usuario
-						if($this->empleado->id_rol != 91)
+						if(!in_array($this->empleado->id_rol, [91,131]))
 							$this->query->where("l.created_by = '{$this->user->id}'", 'AND');
 //						a los jueces se les dificultaría revisar
 //						$this->query->order('l.created_by'); 
@@ -448,46 +448,56 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 				case 'ijuridico':
 					if($this->checkLogin())
 						break;
-									/*
-									109	Actor
-									110	Demandado
-									111	Victima
-									112	Tercero
-									113	Tercero llamado a juicio
-									114	Adjudicatario
-									115	Diverso Acreedor
-									117     Sentenciado
-									116     otro
+/*
+109	Actor
+110	Demandado
+111	Victima
+112	Tercero
+113	Tercero llamado a juicio
+114	Adjudicatario
+115	Diverso Acreedor
+116     otro
+117     Sentenciado
 127	Imputado
 128	Acusado
 129	Ofendido
 130	Apelante
-									*/
-                                    $query_where_in = '116, 109, 110';
+*/
                                     switch($this->empleado->o__id_tipoorgano*1000+$this->empleado->o__id_materia){
+                                        //penales
+                                        case 1005:  //Juzgado Penal
+                                        case 1006:  //Juzgado Penal de Delitos No Graves
+                                        case 1010:  //Juzgado Penal de Ejecución de Sentencias	
+                                        case 3005:  //Consignaciones Penal	
+                                            $query_where_in = '116,127,129';
+                                            break;
+                                        case 2005:  //Sala en materia penal
+                                                $query_where_in = '116, 127, 128, 129, 130';
+                                        case 2014://Sala de Ejecución de Sanciones Penales
+                                            $query_where_in = '116,117';
+                                            break;
+                                        
+                                        //civiles, familiares, ...
                                         case 1001://Juzgado en materia Civil
-                                            $query_where_in .= ',114, 115';
-											if($this->empleado->o__numero<11)
-												$query_where_in .= ',111, 112';
+                                            $query_where_in = '116, 109, 110,114, 115';
+                                            if($this->empleado->o__numero<11)
+                                                    $query_where_in = '116, 109, 110,111, 112';
                                             break;
                                         case 1002://Juzgado Oral en Materia Civil
-                                            $query_where_in .= ',113';
+                                            $query_where_in = '116, 109, 110,113';
                                             break;
-                                        case 2014://Sala de Ejecución de Sanciones Penales
-                                            $query_where_in .= ',117';
-                                            break;
-										case 2005://Sala en materia penal
-											$query_where_in .= ',127, 128, 129, 130';
-										break;
+                                        default :
+                                            $query_where_in = '116, 109, 110';
+                                            break; 
                                     }
                                         
-					$this->query->clear('select');
-					$this->query->select('id, text');
-					$this->query->from('jtc_general');
-					$this->query->where('state = 1');
-					$this->query->where("id_catalogo = '28'");
-					$this->query->where("id IN ({$query_where_in})");
-					$this->query->order('ordering ASC');
+                                    $this->query->clear('select');
+                                    $this->query->select('id, text');
+                                    $this->query->from('jtc_general');
+                                    $this->query->where('state = 1');
+                                    $this->query->where("id_catalogo = '28'");
+                                    $this->query->where("id IN ({$query_where_in})");
+                                    $this->query->order('ordering ASC');
 					
 				break;
 				default:
@@ -875,7 +885,7 @@ AND c.published AND c.clave = '{$this->clave}' AND c.dataType = 'parent'");
 			break;*/
                         //@rule Sólo secretarios de acuerdos y jueces puede editar las observaciones
 			case 'ljpdng01':
-				if(isset($object->field15) && !($this->empleado->id_rol == 91 || $this->empleado->id_rol == 92)  ){
+				if(isset($object->field15) && !in_array($this->empleado->id_rol, [91,92,131])){
 					unset($object->field15);
 					$this->result['message'] .= 'Sólo secretarios de acuerdos y jueces puede editar las observaciones.<br/>';
 					$this->result['warning'] = true;

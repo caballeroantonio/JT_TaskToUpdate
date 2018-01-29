@@ -14,6 +14,7 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
     private $empleado;
     private $libro;
     public $campos;
+	public $uses_tipojuicio = 1;
     /**
      * As_is JSON encoder
      */
@@ -70,6 +71,31 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
                 $campo->childs[$campo->dataIndex] = $childs;
             }
         }
+        
+        switch ($this->libro['id_tipoorgano'] *1000 + $this->libro['id_materia']) {
+            case 1001:	//Juzgado Civil
+            case 1002:	//Juzgado Civil de Proceso Oral
+            case 1003:	//Juzgado Civil de Cuantía Menor
+            case 1004:	//Juzgado Familiar
+            case 1005:	//Juzgado Penal
+            case 1006:	//Juzgado Penal de Delitos No Graves
+            case 1008:	//Juzgado Justicia para Adolescentes para Delitos Graves
+            case 1009:	//Juzgado Justicia para Adolescentes para Delitos No Graves
+            case 1010:	//Juzgado Penal de Ejecución de Sentencias
+            case 1011:	//Juzgado Familiar de Proceso Oral
+            case 1013:	//Juzgado Ejecución de Medidas Sancionadoras en Transición
+            case 2001:	//Sala Civil
+                $this->uses_tipojuicio = 1;
+            break;
+            case 2005:	//Sala Penal
+            case 2014:	//Sala Ejecución de Sanciones Penales
+            case 3005:	//Consignaciones Penal
+                $this->uses_tipojuicio = 0;
+            break;
+            default:
+                $this->uses_tipojuicio = 1;
+            break;
+        }
     }
     
     /**
@@ -119,7 +145,7 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
                 'dataIndex' => 'created_byuser',
                 'text' => 'Creado por',
                 'tooltip' => 'Nombre del usuario que creó el registro.',
-                'hidden' => $this->empleado->id_rol==91?false:true,
+                'hidden' => !in_array($this->empleado->id_rol, [91,131]),
             );
         }
 
@@ -150,8 +176,10 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
                 'tooltip' => $this->libro['id_tipoorgano'] == 2?'Identifica un asunto que se ingresó a Segunda Instancia':'Identifica un asunto ingresado en el Juzgado',
                 'text' => $this->t349h->insertAs_Is('Ext.tx.form.field.ExpedientePicker.prototype.fieldLabel'),
             );  
-
-         if($this->libro['id_tipoorgano']== 2 && $this->libro['id_materia'] == 14){
+         } 
+         
+         //delito, pena
+         if($this->libro['id_tipoorgano']== 2 && in_array($this->libro['id_materia'], [5,14])){
             $columns['e__delito'] = array(
                 'xtype' =>'gridcolumn',
                 'text' =>'Delito',
@@ -167,32 +195,15 @@ class Tsjdf_libros2HelpersBook2ExtJSApp{
                         }"),
             );
          }
-		 
-         if($this->libro['id_tipoorgano']== 2 && $this->libro['id_materia'] == 5){
-            $columns['e__delito'] = array(
-                'xtype' =>'gridcolumn',
-                'text' =>'Delito',
-                'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
-                                        return record.getExpediente().data.delito;
-                        }"),
-            );
-            $columns['e__pena'] = array(
-                'xtype' =>'gridcolumn',
-                'text' =>'Pena o medida privativa',
-                'renderer' => $this->t349h->insertAs_Is("function(value, metaData, record, rowIndex, colIndex, store, view) {
-                                        return record.getExpediente().data.pena;
-                        }"),
-            );
-         }
         
-            //Tipo de juicio
-            $columns['e__txt_tipojuicio'] = array(
-                'xtype' =>'gridcolumn',
-                'dataIndex' =>'e__txt_tipojuicio',
-                'text' =>'Tipo de juicio'
-            );
-         } 
-
+        if($this->uses_tipojuicio)
+        $columns['e__txt_tipojuicio'] = array(
+            'xtype' =>'gridcolumn',
+            'dataIndex' =>'e__txt_tipojuicio',
+            'text' =>'Tipo de juicio'
+        );
+        
+        
         //SECRETARÍA        
         if($this->libro['distribution'] == 2){
             $columns[] = array(
@@ -528,8 +539,10 @@ EOD;
                 $this->fields['id_expediente'] = array(
                     'xtype' => 'expedientepicker',
                     'name' => 'id_expediente',
-                    'isSala' => $this->libro['id_tipoorgano'] == 2,
-                    'isSalaPenal' => $this->libro['id_tipoorgano'] == 2 && 
+					
+                    'have_tipojuicio' => $this->uses_tipojuicio,
+                    'have_bis_nrecurso' => $this->libro['id_tipoorgano'] == 2,
+                    'have_delito_pena' => $this->libro['id_tipoorgano'] == 2 && 
                         (
                             $this->libro['id_materia'] == 5 ||
                             $this->libro['id_materia'] == 14
@@ -826,23 +839,8 @@ EOD;
                         'fieldLabel' => 'Número de recurso',
                         'fieldCls' => 'Ext.form.field.Number',
                     ),
-                    'id_tipojuicio' => array(
-                        'fieldLabel' => 'Tipo de juicio',
-                        'fieldCls' => 'Ext.form.field.ComboBox',
-
-                        'emptyText' => 'Select',
-                        'forceSelection' => true,
-                        'queryMode' => 'local',
-
-                        'store' => 'catalogo.tipojuicio',
-                        'displayField' => 'tipojuicio',
-                        'valueField' => 'id',
-                    ),
-                    'txt_tipojuicio' => array(
-                        'fieldLabel' => 'Tipo de juicio',
-                    ),
                 ),
-                'menuItems' => ['numero','ano','bis','nrecurso', 'id_tipojuicio', 'txt_tipojuicio',],
+                'menuItems' => ['numero','ano','bis','nrecurso',],
             );
 
             //partescontenciosas
@@ -876,6 +874,28 @@ EOD;
             );
 
         }
+        
+        if($this->uses_tipojuicio){
+            $filters['id_expediente']['fields']['id_tipojuicio'] = array(
+                        'fieldLabel' => 'Tipo de juicio',
+                        'fieldCls' => 'Ext.form.field.ComboBox',
+
+                        'emptyText' => 'Select',
+                        'forceSelection' => true,
+                        'queryMode' => 'local',
+
+                        'store' => 'catalogo.tipojuicio',
+                        'displayField' => 'tipojuicio',
+                        'valueField' => 'id',
+                    );
+            $filters['id_expediente']['fields']['txt_tipojuicio'] = array(
+                        'fieldLabel' => 'Tipo de juicio',
+                    );
+            
+            $filters['id_expediente']['menuItems'][] = 'id_tipojuicio';
+            $filters['id_expediente']['menuItems'][] = 'txt_tipojuicio';
+        }
+        
         //secretaría
         if($this->libro['distribution'] == 2){
             $filters[] = array(
@@ -1111,7 +1131,8 @@ EOD;
         $is_root = empty($campos);
         $stores = [];
         if($is_root){
-            $stores[] = 'catalogo.tipojuicio';
+//			if($this->uses_tipojuicio)// lo requiere el js
+	            $stores[] = 'catalogo.tipojuicio';
             $stores[] = 'catalogo.SiNo';
             $stores[] = 'catalogo.general28';//partescontenciosas
 			
@@ -1255,22 +1276,21 @@ EOD;
                 true:false, 
         );
         
-        if(in_array($this->libro['id_tipoorgano'], [1,2])){
-
+        if(in_array($this->libro['id_tipoorgano'], [1,2]))
             //e__name
             $fields['e__name'] = array(
                 'name' => 'e__name',
                 'type' =>  'string',
                 'persist' => false
             );
-
+		
+		if($this->uses_tipojuicio)
             //e__txt_tipojuicio
             $fields['e__txt_tipojuicio'] = array(
                             'name' => 'e__txt_tipojuicio',
                             'type' =>  'string',
                             'persist' => false
             );
-        }
         
         //anoj
         $fields[] = array(
