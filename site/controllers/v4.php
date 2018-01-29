@@ -402,18 +402,20 @@ class Tsjdf_libros2ControllerV4 extends Tsjdf_libros2ControllerWS
 					if($this->checkLogin())
 						break;
                                         $this->query->clear('select')
-                                        ->select('e__id AS "id", u__name')
-                                        ->where('e__id_rol = 91')
-                                        ->where("e__id_organo = {$this->empleado->id_organo}")
-					->from('jtva_empleados l');
+                                        ->select('s.id AS "id", CONCAT_WS(" - ",s.secretaria,  u__name) "txt"')
+					->from('jtc_secretarias s')
+                                        ->join('LEFT', 'jtva_empleados e ON s.id_organo = e.e__id_organo AND s.id = e.e__id_secretaria AND e.e__id_rol = 91 AND e.u__block = 0')
+                                        ->where('s.secretaria LIKE "Ponencia%"')
+                                        ->where("s.id_organo = {$this->empleado->id_organo}")
+                                        ->order('s.description');
 					break;
 				case 'tipojuicio':
 					if($this->checkLogin())
 						break;
-					$this->query->clear('select');
-					$this->query->select('id, tipojuicio');
-					$this->query->from('jtvc_tipojuicio');
-					$this->query->where("id_organo = '{$this->empleado->id_organo}'");
+					$this->query->clear('select')
+					->select('id, tipojuicio')
+					->from('jtvc_tipojuicio')
+					->where("id_organo = '{$this->empleado->id_organo}'");
 					break;
 				case 'secretarias':
 					if($this->checkLogin())
